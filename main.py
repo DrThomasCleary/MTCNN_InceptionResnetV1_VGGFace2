@@ -12,11 +12,11 @@ mtcnn = MTCNN(image_size=100, margin=24, keep_all=False, min_face_size=100)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
 # load the training dataset
-train_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/training')
+train_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/training1photo')
 train_loader = DataLoader(train_dataset, collate_fn=lambda x: x[0])
 
 # load the test dataset
-test_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/testing')
+test_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/testing1photo')
 test_loader = DataLoader(test_dataset, collate_fn=lambda x: x[0])
 
 # generate embeddings for the training dataset
@@ -54,27 +54,31 @@ def minimum_distance(embedding_list, emb):
         min_dist = min(dist_list)
         min_dist_index = dist_list.index(min_dist)
         name = train_name_list[min_dist_index]
-        return name, min_dist
+        return name, min_dist, dist_list
     else:
-        return 'Unknown', None
+        return 'Unknown', None, []
 
 # calculate the accuracy of the model
 y_true = []
 y_pred = []
+dist_list = []
 for i, emb in enumerate(test_embedding_list):
     name_true = test_name_list[i]
-    name_pred, min_dist = minimum_distance(train_embedding_list, emb)
+    name_pred, min_dist, distances = minimum_distance(train_embedding_list, emb)
     y_true.append(name_true)
     y_pred.append(name_pred)
+    dist_list += distances
 
 accuracy = accuracy_score(y_true, y_pred)
 precision = precision_score(y_true, y_pred, average='macro')
 recall = recall_score(y_true, y_pred, average='macro')
 f1 = f1_score(y_true, y_pred, average='macro')
 cm = confusion_matrix(y_true, y_pred, labels=train_dataset.classes)
+avg_min_dist = sum(dist_list) / len(dist_list)
 
 print("Accuracy: ", accuracy)
 print("Precision: ", precision)
 print("Recall: ", recall)
 print("F1-score: ", f1)
 print("Confusion matrix: ", cm)
+print("Average minimum distance: ", avg_min_dist)
