@@ -1,3 +1,6 @@
+
+For taking 2 or more photos and putting 1 in the testing and the rest in the training folder.
+
 find /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/dataset/lfw-deepfunneled/lfw-deepfunneled -type d -exec sh -c '
   for d; do
     if [ "$(find "$d" -maxdepth 1 -type f | wc -l)" -gt 3 ]; then
@@ -9,6 +12,30 @@ find /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/datase
           cp "$f" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/testing/"${d##*/}"/"${f##*/}"
         else
           cp "$f" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/training/"${d##*/}"/"${f##*/}"
+        fi
+        i=$((i+1))
+      done
+    fi
+  done
+' sh {} +
+
+
+
+
+
+find /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/dataset/lfw-deepfunneled/lfw-deepfunneled -mindepth 1 -maxdepth 1 -type d -exec sh -c '
+  for d; do
+    if [ "$(find "$d" -maxdepth 1 -type f | wc -l)" -eq 2 ]; then
+      parent="$(dirname "$d")"
+      basename="$(basename "$d")"
+      mkdir -p /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/training1photo/"$basename"
+      mkdir -p /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/testing1photo/"$basename"
+      i=0
+      for f in "$d"/*; do
+        if [ "$i" -eq 0 ]; then
+          cp "$f" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/testing1photo/"$basename"/"${f##*/}"
+        else
+          cp "$f" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/training1photo/"$basename"/"${f##*/}"
         fi
         i=$((i+1))
       done
