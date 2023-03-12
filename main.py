@@ -1,4 +1,4 @@
-# importing libraries
+#importing libraries
 from facenet_pytorch import MTCNN, InceptionResnetV1
 import torch
 from torchvision import datasets
@@ -13,51 +13,97 @@ import random
 mtcnn = MTCNN(image_size=100, margin=24, keep_all=False, min_face_size=50)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
-# load the dataset
-dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/lfw')
-dataset.idx_to_class = {i: c for c, i in dataset.class_to_idx.items()}
-loader = DataLoader(dataset, collate_fn=lambda x: x[0], shuffle=True, batch_size=100)
+# # load the dataset
+# matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/matched_faces')
+# matched_dataset.idx_to_class = {i: c for c, i in matched_dataset.class_to_idx.items()}
+
+
+mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/mismatched_faces')
+mismatched_dataset.idx_to_class = {i: c for c, i in mismatched_dataset.class_to_idx.items()}
+mismatched_loader = DataLoader(mismatched_dataset, collate_fn=lambda x: x[0])
+
+# # generate embeddings for the dataset
+# matched_embedding_list = []
+# matched_name_list = []
+# for folder in os.listdir(matched_dataset.root):
+#     folder_path = os.path.join(matched_dataset.root, folder)
+#     if os.path.isdir(folder_path):
+#         # load the first two images in the folder
+#         images = []
+#         for i, filename in enumerate(sorted(os.listdir(folder_path))):
+#             if i >= 2:
+#                 break
+#             image_path = os.path.join(folder_path, filename)
+#             image = datasets.folder.default_loader(image_path)
+#             images.append(image)
+#         # detect faces and generate embeddings for the two images in the folder
+#         if len(images) == 2:
+#             embeddings = []
+#             for i in range(2):
+#                 face, face_prob = mtcnn(images[i], return_prob=True)
+#                 if face is not None and face_prob > 0.90:
+#                     emb = resnet(face.unsqueeze(0))
+#                     embeddings.append(emb.detach())
+#                 else:
+#                     print(f"No face detected in {os.path.basename(image_path)}")
+#                     break
+#             if len(embeddings) == 2:
+#                 matched_embedding_list.extend(embeddings)
+#                 matched_name_list.extend([folder] * 2)
+#             else:
+#                 print(f"Not enough faces detected in {folder_path}")
 
 # generate embeddings for the dataset
-embedding_list = []
-name_list = []
-for image, index in loader:
+mismatched_embedding_list = []
+mismatched_name_list = []
+for image, index in mismatched_loader:
     face, face_prob = mtcnn(image, return_prob=True)
     if face is not None and face_prob > 0.90:
         emb = resnet(face.unsqueeze(0))
-        embedding_list.append(emb.detach())
-        name_list.append(dataset.idx_to_class[index])
+        mismatched_embedding_list.append(emb.detach())
+        mismatched_name_list.append(mismatched_dataset.idx_to_class[index])
     else:
         print("No face detected in image:", index)
 
+if len(mismatched_embedding_list) % 2 != 0:
+    mismatched_embedding_list.pop()
+    mismatched_name_list.pop()
+
+
 # calculate the accuracy and F1 score of the model
-num_pairs = 50
 num_correct = 0
 dist_list = []
 y_true = []
 y_pred = []
 
+# # compare embeddings and calculate metrics
+# for i in range(0, len(matched_embedding_list), 2):
+#     emb1 = matched_embedding_list[i] 
+#     emb2 = matched_embedding_list[i+1]
+#     dist = torch.dist(emb1, emb2).item()
+#     dist_list.append(dist)
+#     is_match = matched_name_list[i] == matched_name_list[i+1]
+#     y_true.append(is_match)
+#     y_pred.append(dist < 1.24)
+#     if (dist < 1.24 and is_match) or (dist > 1.24 and not is_match):
+#         num_correct += 1
 
-for i in range(num_pairs*2):
-    idx1 = random.randint(0, len(embedding_list)-1)
-    idx2 = random.randint(0, len(embedding_list)-1)
-    emb1 = embedding_list[idx1] 
-    emb2 = embedding_list[idx2]
-    dist = torch.dist(emb1, emb2).item()
-    dist_list.append(dist)
-    print(idx1)
-    print(idx2)
-    print(i)
-    print(torch.equal(emb1, emb2))
-    is_match = name_list[idx1] == name_list[idx2]
-    y_true.append(is_match)
-    y_pred.append(dist < 1.0)
-    if (dist < 1.0 and is_match) or (dist > 1.0 and not is_match):
-        num_correct += 1
 
-print(y_true)
-print(y_pred)        
-accuracy = num_correct / num_pairs / 2
+for i in range(len(mismatched_embedding_list)):
+    if i % 2 == 0:
+        emb1 = mismatched_embedding_list[i] 
+        emb2 = mismatched_embedding_list[i + 1]
+        dist = torch.dist(emb1, emb2).item()
+        dist_list.append(dist)
+        is_match = mismatched_name_list[i] != mismatched_name_list[i + 1]
+        y_true.append(is_match)
+        y_pred.append(dist > 1.0)
+        if (dist > 1.0 and is_match):
+            num_correct += 1
+
+# print(matched_embedding_list)
+# print(matched_name_list)
+accuracy = accuracy_score(y_true, y_pred)
 precision = precision_score(y_true, y_pred)
 recall = recall_score(y_true, y_pred)
 f1 = f1_score(y_true, y_pred)
@@ -67,8 +113,6 @@ fpr, tpr, _ = roc_curve(y_true, dist_list)
 auc_score = auc(fpr, tpr)
 
 print(dist_list)
-print(fpr)
-print(tpr)
 print("Accuracy: ", accuracy)
 print("Precision: ", precision)
 print("Recall: ", recall)

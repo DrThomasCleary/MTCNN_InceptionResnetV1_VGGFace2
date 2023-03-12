@@ -15,3 +15,13 @@ find /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/datase
     fi
   done
 ' sh {} +
+
+mkdir /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/{matched_faces,mismatched_faces} && \
+for folder in /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/lfw/*; do \
+  num_files=$(find "$folder" -maxdepth 1 -type f | wc -l); \
+  if [[ $num_files -eq 1 ]]; then \
+    mv "$folder" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/mismatched_faces/; \
+  else \
+    mv "$folder" /Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/matched_faces/; \
+  fi; \
+done
