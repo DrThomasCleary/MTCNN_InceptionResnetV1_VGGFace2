@@ -11,11 +11,11 @@ mtcnn = MTCNN(image_size=100, margin=24, keep_all=False, min_face_size=50)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
 # load the dataset
-matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/matched_faces')
+matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces')
 matched_dataset.idx_to_class = {i: c for c, i in matched_dataset.class_to_idx.items()}
 
 
-mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/mismatched_faces')
+mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/mismatched_faces')
 mismatched_dataset.idx_to_class = {i: c for c, i in mismatched_dataset.class_to_idx.items()}
 mismatched_loader = DataLoader(mismatched_dataset, collate_fn=lambda x: x[0])
 
@@ -38,7 +38,7 @@ for folder in os.listdir(matched_dataset.root):
             embeddings = []
             for i in range(2):
                 face, face_prob = mtcnn(images[i], return_prob=True)
-                if face is not None and face_prob > 0.90:
+                if face is not None and face_prob > 0.73:
                     emb = resnet(face.unsqueeze(0))
                     embeddings.append(emb.detach())
                 else:
@@ -55,7 +55,7 @@ mismatched_embedding_list = []
 mismatched_name_list = []
 for image, index in mismatched_loader:
     face, face_prob = mtcnn(image, return_prob=True)
-    if face is not None and face_prob > 0.90:
+    if face is not None and face_prob > 0.73:
         emb = resnet(face.unsqueeze(0))
         mismatched_embedding_list.append(emb.detach())
         mismatched_name_list.append(mismatched_dataset.idx_to_class[index])
@@ -82,7 +82,7 @@ for i in range(0, len(matched_embedding_list), 2):
     is_match = matched_name_list[i] == matched_name_list[i+1]
     y_true.append(is_match)
     y_pred.append(dist < 1.24)
-    if (dist < 1.24 and is_match) or (dist > 1.24 and not is_match):
+    if (dist < 1.24 and is_match):
         num_correct += 1
 
 
@@ -95,7 +95,7 @@ for i in range(len(mismatched_embedding_list)):
         is_match = mismatched_name_list[i] != mismatched_name_list[i + 1]
         y_true.append(is_match)
         y_pred.append(dist > 0.9)
-        if (dist > 0.9 and is_match) or (dist < 0.9 and not is_match):
+        if (dist < 0.9 and not is_match):
             num_correct += 1
 
 

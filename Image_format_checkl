@@ -1,0 +1,15 @@
+from PIL import Image
+import os
+
+folder_path = '/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces'
+
+for root, dirs, files in os.walk(folder_path):
+    for filename in files:
+        if filename.endswith('.jpg') or filename.endswith('.jpeg') or filename.endswith('.png'):
+            image_path = os.path.join(root, filename)
+            with Image.open(image_path) as im:
+                print(f'Image: {filename}')
+                print(f'Format: {im.format}')
+                print(f'Mode: {im.mode}')
+                print(f'Size: {im.size}')
+                print(f'Resolution: {im.info.get("dpi")}')
