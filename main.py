@@ -4,7 +4,7 @@ import torch
 from torchvision import datasets
 from torch.utils.data import DataLoader
 import os
-from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, confusion_matrix, ConfusionMatrixDisplay
+from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import numpy as np
 
@@ -136,58 +136,50 @@ for i in range(0, len(mismatched_embedding_list), 2):
     pred_mismatched.append(dist > eer_threshold)
 
 # True positives
-tp = 0
-dist_tp = []
+matched_correctly = 0
+dist_matched_correctly = []
 for dist, same_face, pred in zip(dist_matched, true_matched, pred_matched):
     if same_face == True and pred == True:
-        tp += 1
-        dist_tp.append(dist)
+        matched_correctly += 1
+        dist_matched_correctly.append(dist)
 
 # True negatives
-tn = 0
-dist_tn = []
+mismatched_correctly = 0
+dist_mismatched_correctly = []
 for dist, different_face, pred in zip(dist_mismatched, true_mismatched, pred_mismatched):
     if different_face == True and pred == True:
-        tn += 1
-        dist_tn.append(dist)
+        mismatched_correctly += 1
+        dist_mismatched_correctly.append(dist)
 
 # False positives
-fp = 0
-dist_fp = []
+matched_incorrectly = 0
+dist_matched_incorrectly = []
 for dist, same_face, pred in zip(dist_matched, true_matched, pred_matched):
     if same_face == True and pred == False:
-        fp += 1
-        dist_fp.append(dist)
+        matched_incorrectly += 1
+        dist_matched_incorrectly.append(dist)
 
 # False negatives
-fn = 0
-dist_fn = []
+mismatched_incorrectly = 0
+dist_mismatched_incorrectly = []
 for dist, different_face, pred in zip(dist_mismatched, true_mismatched, pred_mismatched):
     if different_face == True and pred == False:
-        fn += 1
-        dist_fn.append(dist)
+        mismatched_incorrectly += 1
+        dist_mismatched_incorrectly.append(dist)
 
-accuracy = (tp + tn) / (tp + tn + fp + fn)
-precision = tp / (tp + fp)
-recall = tp / (tp + fn)
+accuracy = (matched_correctly + mismatched_correctly) / (matched_correctly + mismatched_correctly + matched_incorrectly + mismatched_incorrectly)
+precision = matched_correctly / (matched_correctly + matched_incorrectly)
+recall = matched_correctly / (matched_correctly + mismatched_incorrectly)
 f1 = 2 * precision * recall / (precision + recall)
 
-print("True Positives: ", tp)
-print("True Negatives: ", tn)
-print("False Positives: ", fp)
-print("False Negatives: ", fn)
+print("matched_correctly: ", matched_correctly)
+print("True Negatives: ", mismatched_correctly)
+print("False Positives: ", matched_incorrectly)
+print("False Negatives: ", mismatched_incorrectly)
 print("Accuracy: ", accuracy)
 print("Precision: ", precision)
 print("Recall: ", recall)
 print("F1 score: ", f1)
-
-# # Create the confusion matrix
-# cm = confusion_matrix(y_true, y_pred)
-
-# # Plot the confusion matrix
-# disp = ConfusionMatrixDisplay(confusion_matrix=cm, display_labels=["Not a match", "Match"])
-# disp.plot()
-# plt.show() 
 
 # Scatter plot
 fig, ax = plt.subplots()
@@ -196,23 +188,23 @@ fig, ax = plt.subplots()
 jitter_amount = 0.5
 
 # True positives
-ax.scatter(dist_tp, add_jitter([3] * len(dist_tp), jitter_amount), c='green', alpha=0.5, label='True Positives')
+ax.scatter(dist_matched_correctly, add_jitter([0] * len(dist_matched_correctly), jitter_amount), c='green', alpha=0.5, label='Matched_Correctly')
 
 # True negatives
-ax.scatter(dist_tn, add_jitter([2] * len(dist_tn), jitter_amount), c='blue', alpha=0.5, label='True Negatives')
+ax.scatter(dist_mismatched_correctly, add_jitter([0] * len(dist_mismatched_correctly), jitter_amount), c='blue', alpha=0.5, label='Mismatched_Correctly')
 
 # False positives
-ax.scatter(dist_fp, add_jitter([1] * len(dist_fp), jitter_amount), c='red', alpha=0.5, label='False Positives')
+ax.scatter(dist_matched_incorrectly, add_jitter([0] * len(dist_matched_incorrectly), jitter_amount), c='red', alpha=0.5, label='Matched_Incorrectly')
 
 # False negatives
-ax.scatter(dist_fn, add_jitter([0] * len(dist_fn), jitter_amount), c='orange', alpha=0.5, label='False Negatives')
+ax.scatter(dist_mismatched_incorrectly, add_jitter([0] * len(dist_mismatched_incorrectly), jitter_amount), c='orange', alpha=0.5, label='Mismatched_Incorrectly')
 
 # EER threshold
 ax.axvline(x=eer_threshold, color='purple', linestyle='--', label='EER Threshold')
 
 ax.set_xlabel('Distance')
 ax.set_yticks([0, 1, 2, 3])
-ax.set_yticklabels(['False Negatives', 'False Positives', 'True Negatives', 'True Positives'])
+ax.set_yticklabels(['Mismatched_Incorrectly', 'Matched_Incorrectly', 'Mismatched_Correctly', 'Matched_Correctly'])
 ax.legend()
 
 plt.show()
