@@ -4,19 +4,19 @@ import torch
 from torchvision import datasets
 from torch.utils.data import DataLoader
 import os
-from sklearn.metrics import confusion_matrix, ConfusionMatrixDisplay
 import matplotlib.pyplot as plt
 import numpy as np
+import time
 
 # initializing MTCNN and InceptionResnetV1 
 mtcnn = MTCNN(image_size=100, margin=24, keep_all=False, min_face_size=50)
 resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
 # load the dataset
-matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces_test')
+matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces_blurred_5')
 matched_loader = DataLoader(matched_dataset, collate_fn=lambda x: x[0])
 
-mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/mismatched_faces_test')
+mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/mismatched_faces_blurred_5')
 mismatched_dataset.idx_to_class = {i: c for c, i in mismatched_dataset.class_to_idx.items()}
 mismatched_loader = DataLoader(mismatched_dataset, collate_fn=lambda x: x[0])
 
@@ -41,6 +41,10 @@ def calculate_far_frr(labels, distances, threshold):
 def add_jitter(values, jitter_amount=0.2):
     return values + np.random.uniform(-jitter_amount, jitter_amount, len(values))
 
+# Initialize variables to track time
+resnet_time = 0
+n_operations = 0
+
 # generate embeddings for the dataset
 matched_embedding_list = []
 matched_name_list = []
@@ -59,35 +63,43 @@ for folder in os.listdir(matched_dataset.root):
         if len(images) == 2:
             embeddings = []
             for i in range(2):
+                start_time_matched_resnet = time.time()
                 face, face_prob = mtcnn(images[i], return_prob=True)
-                if face is not None and face_prob > 0.73:
+                if face is not None and face_prob > 0.00:
                     emb = resnet(face.unsqueeze(0))
                     embeddings.append(emb.detach())
                 else:
                     print(f"No face detected in {os.path.basename(image_path)}")
                     break
+                elapsed_time_matched_resnet = time.time() - start_time_matched_resnet
+                resnet_time += elapsed_time_matched_resnet
+                n_operations += 1
             if len(embeddings) == 2:
                 matched_embedding_list.extend(embeddings)
                 matched_name_list.extend([folder] * 2)
             else:
                 print(f"Not enough faces detected in {folder_path}")
+            
 
 # generate embeddings for the dataset
 mismatched_embedding_list = []
 mismatched_name_list = []
 for image, index in mismatched_loader:
+    start_time__mismatched_resnet = time.time()
     face, face_prob = mtcnn(image, return_prob=True)
-    if face is not None and face_prob > 0.73:
+    if face is not None and face_prob > 0.00:
         emb = resnet(face.unsqueeze(0))
         mismatched_embedding_list.append(emb.detach())
         mismatched_name_list.append(mismatched_dataset.idx_to_class[index])
+        elapsed_time_mismatched_resnet = time.time() - start_time__mismatched_resnet
+        resnet_time += elapsed_time_mismatched_resnet
+        n_operations += 1
     else:
         print("No face detected in image:", index)
 
 if len(mismatched_embedding_list) % 2 != 0:
     mismatched_embedding_list.pop()
     mismatched_name_list.pop()
-
 
 dist_matched = [torch.dist(matched_embedding_list[i], matched_embedding_list[i + 1]).item() for i in range(0, len(matched_embedding_list), 2)]
 dist_mismatched = [torch.dist(mismatched_embedding_list[i], mismatched_embedding_list[i + 1]).item() for i in range(0, len(mismatched_embedding_list), 2)]
@@ -172,10 +184,12 @@ precision = matched_correctly / (matched_correctly + matched_incorrectly)
 recall = matched_correctly / (matched_correctly + mismatched_incorrectly)
 f1 = 2 * precision * recall / (precision + recall)
 
-print("matched_correctly: ", matched_correctly)
-print("True Negatives: ", mismatched_correctly)
-print("False Positives: ", matched_incorrectly)
-print("False Negatives: ", mismatched_incorrectly)
+average_resnet_time = resnet_time / n_operations
+print("Average InceptionResnetV1 time:", average_resnet_time)
+print("Matched_Correctly: ", matched_correctly)
+print("Mismatched_Correctly: ", mismatched_correctly)
+print("Matched_Incorrectly: ", matched_incorrectly)
+print("Mismatched_Incorrectly: ", mismatched_incorrectly)
 print("Accuracy: ", accuracy)
 print("Precision: ", precision)
 print("Recall: ", recall)
@@ -188,14 +202,11 @@ fig, ax = plt.subplots()
 jitter_amount = 0.5
 
 # True positives
-ax.scatter(dist_matched_correctly, add_jitter([0] * len(dist_matched_correctly), jitter_amount), c='green', alpha=0.5, label='Matched_Correctly')
-
+ax.scatter(dist_matched_correctly, add_jitter([3] * len(dist_matched_correctly), jitter_amount), c='green', alpha=0.5, label='Matched_Correctly')
 # True negatives
-ax.scatter(dist_mismatched_correctly, add_jitter([0] * len(dist_mismatched_correctly), jitter_amount), c='blue', alpha=0.5, label='Mismatched_Correctly')
-
+ax.scatter(dist_mismatched_correctly, add_jitter([2] * len(dist_mismatched_correctly), jitter_amount), c='blue', alpha=0.5, label='Mismatched_Correctly')
 # False positives
-ax.scatter(dist_matched_incorrectly, add_jitter([0] * len(dist_matched_incorrectly), jitter_amount), c='red', alpha=0.5, label='Matched_Incorrectly')
-
+ax.scatter(dist_matched_incorrectly, add_jitter([1] * len(dist_matched_incorrectly), jitter_amount), c='red', alpha=0.5, label='Matched_Incorrectly')
 # False negatives
 ax.scatter(dist_mismatched_incorrectly, add_jitter([0] * len(dist_mismatched_incorrectly), jitter_amount), c='orange', alpha=0.5, label='Mismatched_Incorrectly')
 
