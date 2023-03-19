@@ -1,11 +1,11 @@
 from PIL import Image, ImageFilter
 import os
 
-path_to_original_images = '/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces'
-path_to_blurred_images = '/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/matched_faces_blurred_4'
+path_to_original_images = '/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/mismatched_faces'
+path_to_blurred_images = '/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/mismatched_faces_blurred_1'
 
 # blur amount
-blur_amounts = [4]
+blur_amounts = [1]
 
 for folder in os.listdir(path_to_original_images):
     folder_path = os.path.join(path_to_original_images, folder)
