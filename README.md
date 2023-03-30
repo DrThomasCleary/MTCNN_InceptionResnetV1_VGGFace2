@@ -41,7 +41,6 @@ My Results on testing this model on the LFW Dataset:
 
 With my results as such:
 Optimal Accuracy Threshold Distance: 0.9401680336067213
-
 Average Computation time: 0.07874587009719577
 Total images not recognised in matched_faces: 0
 Total images not recognised in mismatched_faces: 0
