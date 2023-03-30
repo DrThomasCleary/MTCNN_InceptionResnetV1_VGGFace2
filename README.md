@@ -1,17 +1,10 @@
 # MTCNN-VGGFace2-InceptionResnetV1
 Face recognition using MTCNN(face detection)-VGGFace2/InceptionResnetV1(face recognition)
 To test any dataset, you need to have a folder directory as such:
-Matched_Faces_folder
-  |-Folder_of_Person_1
-    |-Image_1_of_person_1
-    |-Image_2_of_person_1
 
-Mismatched_Faces_Folder
-  |-Folder_of_Person_2
-    |-Image_1_of_person_2
-  |-Folder_of_Person_3
-    |-Image_1_of_person_3
-    
+![Screenshot 2023-03-30 at 23 31 14](https://user-images.githubusercontent.com/118690399/228978008-9fd910cf-d18f-402e-854b-ae16cd52f40e.png)
+
+
 This way The program will compare the images of person 1 to see if it is the right face or not, and then take image 1 of person 2 and 3 to see if 
 it rightly predicts that these 2 people are not the same person. 
 
@@ -40,20 +33,8 @@ My Results testing this model on the LFW Dataset:
 ![Figure_1](https://user-images.githubusercontent.com/118690399/228976526-02a12f93-d466-45a7-ba4f-72159bc8907b.png)
 
 With my results as such:
-  -Optimal Accuracy Threshold Distance: 0.9401680336067213
-  -Average Computation time: 0.07874587009719577
-  -Total images not recognised in matched_faces: 0
-  -Total images not recognised in mismatched_faces: 0
-  -Detection Rate: 100.0
-  -True Positives:  1298
-  -True Negatives:  1915
-  -False Negatives:  382
-  -False Positives:  119
-  -Average distance for matched faces: 0.8175285885199195
-  -Average distance for mismatched faces: 1.1436471557546857
-  -EER: 0.1494319778058716
-  -Accuracy:  0.8651050080775444
-  -Precision:  0.9160197600564574
-  -Recall:  0.7726190476190476
-  -F1 score:  0.8382305456893769
+
+![Screenshot 2023-03-30 at 23 31 48](https://user-images.githubusercontent.com/118690399/228978090-9770ad6b-f9fd-4b3c-a0bd-2844113bdd65.png)
+
+
 
