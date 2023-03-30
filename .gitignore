@@ -7,3 +7,4 @@ lfw
 matched_faces
 mismatched_faces
 pretrained_models
+vits_face.py
