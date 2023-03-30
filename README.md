@@ -21,12 +21,7 @@ for folder in path_to_directory/lfw/*; do \
   fi; \
 done
 
-This code snippet creates two new directories in the root of the project folder named "matched_faces" and "mismatched_faces".
-It then iterates over each folder in the "lfw" directory and moves each folder containing only one image to the "mismatched_faces" directory, 
-and each folder containing more than one image to the "matched_faces" directory. The mkdir command creates the new directories, 
-and the for loop iterates over the folders in the "lfw" directory. 
-The if statement checks whether a folder contains only one image or more than one image, 
-and the mv command moves the folder to the appropriate directory.
+This block of code creates two new directories named "matched_faces" and "mismatched_faces" in the root directory of the project. It then searches for all folders in the "lfw" directory and sorts them into the appropriate directory based on the number of images they contain. Folders with only one image are moved to the "mismatched_faces" directory, while folders with more than one image are moved to the "matched_faces" directory. The mkdir command is used to create the new directories, while the for loop iterates through the folders in the "lfw" directory. The if statement checks how many images each folder contains, and the mv command moves the folder to the corresponding directory.
 
 
 My Results testing this model on the LFW Dataset:
@@ -37,4 +32,4 @@ With my results as such:
 ![Screenshot 2023-03-30 at 23 31 48](https://user-images.githubusercontent.com/118690399/228978090-9770ad6b-f9fd-4b3c-a0bd-2844113bdd65.png)
 
 
-
+With a detailed analysis such as this, you can accurately assess how well a model is performing in all aspects, rather than relying solely on accuracy and F1 scores. Often, models can be deceptive in appearing to perform well, but in reality, they are completely incorrect. I learned this lesson the hard way. Therefore, it is crucial to eliminate any potential areas of error, and a thorough analysis can help prevent models from receiving recognition based solely on a select few metrics, while neglecting others.
