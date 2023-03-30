@@ -34,3 +34,27 @@ and each folder containing more than one image to the "matched_faces" directory.
 and the for loop iterates over the folders in the "lfw" directory. 
 The if statement checks whether a folder contains only one image or more than one image, 
 and the mv command moves the folder to the appropriate directory.
+
+
+My Results on testing this model on the LFW Dataset:
+![Figure_1](https://user-images.githubusercontent.com/118690399/228976526-02a12f93-d466-45a7-ba4f-72159bc8907b.png)
+
+With my results as such:
+Optimal Accuracy Threshold Distance: 0.9401680336067213
+
+Average Computation time: 0.07874587009719577
+Total images not recognised in matched_faces: 0
+Total images not recognised in mismatched_faces: 0
+Detection Rate: 100.0
+True Positives:  1298
+True Negatives:  1915
+False Negatives:  382
+False Positives:  119
+Average distance for matched faces: 0.8175285885199195
+Average distance for mismatched faces: 1.1436471557546857
+EER: 0.1494319778058716
+Accuracy:  0.8651050080775444
+Precision:  0.9160197600564574
+Recall:  0.7726190476190476
+F1 score:  0.8382305456893769
+
