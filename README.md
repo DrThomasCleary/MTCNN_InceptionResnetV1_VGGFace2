@@ -1,4 +1,7 @@
 # MTCNN-VGGFace2-InceptionResnetV1
+Implementation of https://github.com/timesler/facenet-pytorch 
+
+
 Face recognition using MTCNN(face detection)-VGGFace2/InceptionResnetV1(face recognition)
 To test any dataset, you need to have a folder directory as such:
 
