@@ -36,3 +36,17 @@ With my results as such:
 
 
 With a detailed analysis such as this, you can accurately assess how well a model is performing in all aspects, rather than relying solely on accuracy and F1 scores. Often, models can be deceptive in appearing to perform well, but in reality, they are completely incorrect. I learned this lesson the hard way. Therefore, it is crucial to eliminate any potential areas of error, and a thorough analysis can help prevent models from receiving recognition based solely on a select few metrics, while neglecting others.
+
+I have edited the LFW Images to measure how different Occlusion tests such as Blurriness or filters will affect the performance of the model. My results are below: 
+![Screenshot 2023-03-31 at 15 44 45](https://user-images.githubusercontent.com/118690399/229152869-009550fa-d653-4407-95c2-15813b7765b2.png)
+
+![Screenshot 2023-03-31 at 15 45 08](https://user-images.githubusercontent.com/118690399/229152953-a283d2e6-7d69-461b-ad85-f26b17abf6f7.png)
+
+![Screenshot 2023-03-31 at 15 45 24](https://user-images.githubusercontent.com/118690399/229153036-49a7fed0-73a9-47c0-8910-35560517e256.png)
+
+![Screenshot 2023-03-31 at 15 45 50](https://user-images.githubusercontent.com/118690399/229153159-ca112730-7237-4fec-bf08-d7b25cae2a0e.png)
+
+I believe more papers and analysis on different algorithms should provide much more data on how their model performs under many different circumstances in order to make comparisons easier or application use more efficient. This is not easy as many parameters and aspects have to align. 
+
+In my other repo, i have done the same analysis on the face transformer model from: https://github.com/zhongyy/Face-Transformer 
+
