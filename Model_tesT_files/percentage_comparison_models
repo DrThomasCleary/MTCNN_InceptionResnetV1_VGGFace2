@@ -1,0 +1,79 @@
+import matplotlib.pyplot as plt
+import numpy as np
+from matplotlib.patches import Patch
+
+filter_tests = ['Color Tint', 'Brightness', 'Contrast', 'Grayscale']
+percentage_change_filter_computation_time_vggface2 =  [1.9241262083237145, -16.096088573050377, 8.568247470274521, -1.6757465739320072]
+percentage_change_filter_detection_rate_vggface2 =  [-0.34292530192337267, -3.044920108531798, -0.29815146094215095, -0.16386116490392055]
+percentage_change_filter_accuracy_vggface2 =  [-0.7888923950773086, -1.1360050489113245, -1.6116139240000895, 0.18933417481855408]
+percentage_change_filter_precision_vggface2 =  [0.853419101500941, -2.1243664860412927, -0.8448897693792565, -0.7792170725641083]
+percentage_change_filter_recall_vggface2 =  [-2.54901960784314, -0.13071895424836555, -2.54901960784314, 1.241830065359485]
+percentage_change_filter_f1_score_vggface2 =  [-0.9339783443083403, -1.1041630582581272, -1.7328978737897187, 0.25500747562706755]
+percentage_change_filter_EER_vggface2 =  [-3.4305314899313766, -28.055619045819906, 8.851234352032854, -19.960870353781026]
+
+# Casia-Webface Percentage Changes
+percentage_change_filter_computation_time_casia =  [-9.254966506192956, 8.577433595061091, 2.168782235269344, -4.625526250227224]
+percentage_change_filter_detection_rate_casia =  [-3.044920108531798, -0.34292530192337267, -0.29815146094215095, -0.16386116490392055]
+percentage_change_filter_accuracy_casia =  [-1.8381167365366065, -1.7413737504031017, -2.357266653987774, 0.48371493066752486]
+percentage_change_filter_precision_casia =  [-2.9635441815548025, -1.269501811542685, -3.474935253061763, -0.05031971087017011]
+percentage_change_filter_recall_casia=  [-0.524246395806027, -2.3591087811271336, -1.048492791612054, 1.1140235910878074]
+percentage_change_filter_f1_score_casia =  [-1.7409844321341552, -1.8253899709419665, -2.258818506273116, 0.537096729757293]
+percentage_change_filter_EER_casia =  [-11.045757353760738, 15.110070782728604, 17.225257773445534, -10.629982807829084]
+
+percentage_change_filter_computation_time_transformer=  [47.97026495299772, 4.658760335722285, 140.47934906894025, -29.194385640848434]
+percentage_change_filter_detection_rate_transformer =  [0.0, 0.0, 0.0, 0.0]
+percentage_change_filter_accuracy_transformer =  [-21.804788213627997, -10.939226519337018, -21.952117863720076, -1.510128913443839]
+percentage_change_filter_precision_transformer =  [-30.875772569010607, 17.664473684210535, 19.39252336448599, -4.297619317666275]
+percentage_change_filter_recall_transformer =  [26.479750778816207, -41.66666666666666, -65.80996884735202, 2.8816199376947087]
+percentage_change_filter_f1_score_transformer =  [-9.39142937517582, -23.186475409836056, -48.15829632210573, -0.6734841166426973]
+percentage_change_filter_EER_transformer =  [8.523592085235919, -4.566210045662098, -16.742770167427697, 4.10958904109589]
+
+hatch_patterns_VGGFace2= 'x'
+hatch_patterns_Casia= 'o'
+hatch_patterns_transformer= '\\\\\\'
+
+def plot_bar_comparison(ax, filter_tests, vggface2_data, casia_data, transformer_data, metric_name, reverse=False):
+    bar_width = 0.25
+    r1 = np.arange(len(filter_tests))
+    r2 = [x + bar_width for x in r1]
+    r3 = [x + bar_width for x in r2]
+
+    for idx, (vgg, casia, transformer) in enumerate(zip(vggface2_data, casia_data, transformer_data)):
+        for value, r, hatch, color in [(vgg, r1[idx], hatch_patterns_VGGFace2, 'b'), (casia, r2[idx], hatch_patterns_Casia, 'g'), (transformer, r3[idx], hatch_patterns_transformer, 'r')]:
+            ax.bar(r, value, color=color, width=bar_width, hatch=hatch, edgecolor='white')
+
+    ax.set_xlabel('Filter Type', fontsize=12)
+    ax.set_xticks([r + bar_width for r in range(len(filter_tests))])
+    ax.set_xticklabels(filter_tests, fontsize=11)
+    ax.set_ylabel('Percentage Change(%)', fontsize=12)
+    ax.set_title(f'{metric_name}', fontsize=14)
+    ax.grid(axis='y')
+
+metrics = [
+    (percentage_change_filter_accuracy_vggface2, percentage_change_filter_accuracy_casia, percentage_change_filter_accuracy_transformer, 'Accuracy', False),
+    (percentage_change_filter_precision_vggface2, percentage_change_filter_precision_casia, percentage_change_filter_precision_transformer, 'Precision', False),
+    (percentage_change_filter_recall_vggface2, percentage_change_filter_recall_casia, percentage_change_filter_recall_transformer, 'Recall', False),
+    (percentage_change_filter_f1_score_vggface2, percentage_change_filter_f1_score_casia, percentage_change_filter_f1_score_transformer, 'F1 Score', False),
+    (percentage_change_filter_EER_vggface2, percentage_change_filter_EER_casia, percentage_change_filter_EER_transformer, 'EER', True),
+    (percentage_change_filter_computation_time_vggface2, percentage_change_filter_computation_time_casia, percentage_change_filter_computation_time_transformer, 'Computation Time', True)
+]
+
+fig, axs = plt.subplots(2, 3, figsize=(15, 10))
+fig.subplots_adjust(hspace=0.3, wspace=0.3)
+
+axs = axs.flat
+
+for ax, (vgg, casia, transformer, label, rev) in zip(axs, metrics):
+    plot_bar_comparison(ax, filter_tests, vgg, casia, transformer, label, reverse=rev)
+
+additional_legend_elements = [
+    Patch(facecolor='b', edgecolor='w', hatch='x', label='VGGFace2'),
+    Patch(facecolor='g', edgecolor='w', hatch='o', label='CASIA-WebFace'),
+    Patch(facecolor='r', edgecolor='w', hatch='\\\\\\', label='Face Transformer')
+]
+legend1 = fig.legend(handles=additional_legend_elements, title='Methods', bbox_to_anchor=(0.8, 0.95), loc='upper left', fontsize='x-large')
+
+fig.suptitle('Percentage Change of Performance Metrics with Change in Filters applied to LFW Images', fontsize=16)
+plt.show()
+
+
