@@ -11,13 +11,13 @@ import random
 
 # initializing MTCNN and InceptionResnetV1 
 mtcnn = MTCNN(image_size = 112)
-resnet = InceptionResnetV1(pretrained='casia-webface').eval()
+resnet = InceptionResnetV1(pretrained='vggface2').eval()
 
 # load the dataset
-matched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/Square_test/matched_faces_black_square_20%')
+matched_dataset = datasets.ImageFolder('path_to_matched_faces_folder')
 matched_loader = DataLoader(matched_dataset, collate_fn=lambda x: x[0])
 
-mismatched_dataset = datasets.ImageFolder('/Users/br/Software/Machine_learning/MTCNN-VGGFace2-InceptionResnetV1/LFW_dataset/Square_test/mismatched_faces_black_square_20%')
+mismatched_dataset = datasets.ImageFolder('path_to_mismatching_faces_folder')
 mismatched_dataset.idx_to_class = {i: c for c, i in mismatched_dataset.class_to_idx.items()}
 mismatched_loader = DataLoader(mismatched_dataset, collate_fn=lambda x: x[0])
 
@@ -54,7 +54,6 @@ computation_time = 0
 n_operations = 0
 unrecognized_matched_faces = 0
 unrecognized_mismatched_faces = 0
-
 
 # generate embeddings for the dataset
 matched_embedding_list = []
@@ -118,7 +117,6 @@ if len(mismatched_embedding_list) % 2 != 0:
     mismatched_embedding_list.pop()
     mismatched_name_list.pop()
 
-
 dist_matched = [torch.dist(matched_embedding_list[i], matched_embedding_list[i + 1]).item() for i in range(0, len(matched_embedding_list), 2)]
 dist_mismatched = [torch.dist(mismatched_embedding_list[i], mismatched_embedding_list[i + 1]).item() for i in range(0, len(mismatched_embedding_list), 2)]
 
@@ -128,7 +126,6 @@ avg_dist_mismatched = np.mean(dist_mismatched)
 
 distances = dist_matched + dist_mismatched
 labels = [1] * len(dist_matched) + [0] * len(dist_mismatched)
-
 
 accuracies = []
 thresholds = np.linspace(0.1, 1.6, 5000)
@@ -159,7 +156,7 @@ for i in range(0, len(matched_embedding_list), 2):
     dist = torch.dist(emb1, emb2).item()
     is_match = matched_name_list[i] == matched_name_list[i + 1]
     true_matched.append(is_match)
-    pred_matched.append(dist < 1.062)
+    pred_matched.append(dist < max_accuracy_threshold)
 
 # Compare embeddings and calculate metrics for mismatched faces
 for i in range(0, len(mismatched_embedding_list), 2):
@@ -168,7 +165,7 @@ for i in range(0, len(mismatched_embedding_list), 2):
     dist = torch.dist(emb1, emb2).item()
     is_mismatch = mismatched_name_list[i] != mismatched_name_list[i + 1]
     true_mismatched.append(is_mismatch)
-    pred_mismatched.append(dist > 1.062)
+    pred_mismatched.append(dist > max_accuracy_threshold)
 
 # Generate random predictions for unrecognized faces
 random_matched_predictions = [random.choice([True, False]) for _ in range(unrecognized_matched_faces)]
@@ -230,7 +227,7 @@ def add_jitter(values, jitter_amount):
 jitter_amount = 0.45
 
 # Define plot title
-plot_title = "MTCNN with InceptionresnetV1 Pre-trained on Casia-Webface tested on the LFW Dataset- 20 Percent Square Size Occlusion"
+plot_title = "MTCNN with InceptionresnetV1 Pre-trained on VGGFace2 tested on the LFW Dataset- 20 Percent Square Size Occlusion"
 
 dist_true_positives = [dist for dist, same_face, pred in zip(dist_matched, true_matched, pred_matched) if same_face == True and pred == True]
 dist_true_negatives = [dist for dist, different_face, pred in zip(dist_mismatched, true_mismatched, pred_mismatched) if different_face == True and pred == True]
@@ -247,7 +244,7 @@ ax.errorbar(dist_true_negatives, add_jitter([1] * len(dist_true_negatives), jitt
 ax.errorbar(dist_false_positives, add_jitter([1] * len(dist_false_positives), jitter_amount), fmt='P', c='orange', alpha=0.5, label='False Positives')
 
 # EER threshold
-ax.axvline(x=1.062, color='purple', linestyle='-', label='Threshold Distance')
+ax.axvline(x=max_accuracy_threshold, color='purple', linestyle='-', label='Optimal Accuracy Threshold Distance')
 ax.axvline(x=avg_dist_matched, color='black', linestyle='-.', label='Average Matched Distance')
 ax.axvline(x=avg_dist_mismatched, color='black', linestyle='--', label='Average Mismatched Distance')
 
