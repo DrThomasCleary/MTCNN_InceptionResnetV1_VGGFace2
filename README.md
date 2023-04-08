@@ -32,8 +32,7 @@ My Results testing this model on the LFW Dataset:
 
 With my results as such:
 
-![Screenshot 2023-03-30 at 23 31 48](https://user-images.githubusercontent.com/118690399/228978090-9770ad6b-f9fd-4b3c-a0bd-2844113bdd65.png)
-
+![Screenshot 2023-04-08 at 23 15 53](https://user-images.githubusercontent.com/118690399/230744740-471f5eae-a125-4247-b262-16a7b4a445b7.png)
 
 With a detailed analysis such as this, you can accurately assess how well a model is performing in all aspects, rather than relying solely on accuracy and F1 scores. Often, models can be deceptive in appearing to perform well, but in reality, they are completely incorrect. I learned this lesson the hard way. Therefore, it is crucial to eliminate any potential areas of error, and a thorough analysis can help prevent models from receiving recognition based solely on a select few metrics, while neglecting others.
 
