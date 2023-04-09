@@ -49,7 +49,9 @@ I changed the LFW images to see how things like blurriness or filters might chan
 
 I think more research papers and analyses on various algorithms should offer more information on their model's performance under a wide range of situations. This would make it easier to compare models and use them more effectively in real-world applications. However, it's not an easy task since many parameters and factors need to be considered.
 
-In my other repository, I have performed a similar analysis on the face transformer model from: https://github.com/zhongyy/Face-Transformer
+In my other repository, I have performed a similar analysis on the face transformer model from the repository: https://github.com/zhongyy/Face-Transformer
+Please check out my results which may intrigue you if you are interested in using the transformer architecute for face recognition:
+https://github.com/DrThomasCleary/Face_Transformer_Analysis
 
 It becomes quite evident that the face transformer, despite achieving decent levels of accuracy, struggles with generalization and is likely overfitted when faced with images that are blurry or low resolution. 
 
