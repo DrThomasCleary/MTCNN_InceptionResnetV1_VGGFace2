@@ -24,7 +24,9 @@ for folder in path_to_directory/lfw/*; do \
   fi; \
 done
 
-This block of code creates two new directories named "matched_faces" and "mismatched_faces" in the root directory of the project. It then searches for all folders in the "lfw" directory and sorts them into the appropriate directory based on the number of images they contain. Folders with only one image are moved to the "mismatched_faces" directory, while folders with more than one image are moved to the "matched_faces" directory. The mkdir command is used to create the new directories, while the for loop iterates through the folders in the "lfw" directory. The if statement checks how many images each folder contains, and the mv command moves the folder to the corresponding directory.
+This code segment generates two new directories titled "matched_faces" and "mismatched_faces" within the project's root directory. Subsequently, it examines all the folders located in the "lfw" directory and categorizes them into the relevant directory based on their image count. Folders possessing a single image are transferred to the "mismatched_faces" directory, while those containing multiple images are relocated to the "matched_faces" directory. The creation of new directories is facilitated by the mkdir command, whereas the for loop iterates through the folders present in the "lfw" directory. The if statement evaluates the quantity of images in each folder, and the mv command relocates the folder to the respective directory.
+
+<img width="483" alt="image" src="https://user-images.githubusercontent.com/118690399/230802129-9055742f-2f2c-40e8-9a9b-8e79e01bc268.png">
 
 
 My Results testing this model on the LFW Dataset:
@@ -34,9 +36,9 @@ With my results as such:
 
 ![Screenshot 2023-04-08 at 23 15 53](https://user-images.githubusercontent.com/118690399/230744740-471f5eae-a125-4247-b262-16a7b4a445b7.png)
 
-With a detailed analysis such as this, you can accurately assess how well a model is performing in all aspects, rather than relying solely on accuracy and F1 scores. Often, models can be deceptive in appearing to perform well, but in reality, they are completely incorrect. I learned this lesson the hard way. Therefore, it is crucial to eliminate any potential areas of error, and a thorough analysis can help prevent models from receiving recognition based solely on a select few metrics, while neglecting others.
+By looking closely at a model's performance, we can understand how well it works in different ways, not just by checking accuracy and F1 scores. Sometimes, models might seem to work well, but they are actually making wrong predictions. I learned this the hard way. So, it's important to find and fix any mistakes, and a deep analysis can stop models from being praised only for a few good metrics while ignoring others.
 
-I have edited the LFW Images to measure how different Occlusion tests such as Blurriness or filters will affect the performance of the model. My results are below: 
+I changed the LFW images to see how things like blurriness or filters might change how well the model works. Here are the results:
 ![Screenshot 2023-03-31 at 15 44 45](https://user-images.githubusercontent.com/118690399/229152869-009550fa-d653-4407-95c2-15813b7765b2.png)
 
 ![Screenshot 2023-03-31 at 15 45 08](https://user-images.githubusercontent.com/118690399/229152953-a283d2e6-7d69-461b-ad85-f26b17abf6f7.png)
@@ -45,7 +47,11 @@ I have edited the LFW Images to measure how different Occlusion tests such as Bl
 
 ![Screenshot 2023-03-31 at 15 45 50](https://user-images.githubusercontent.com/118690399/229153159-ca112730-7237-4fec-bf08-d7b25cae2a0e.png)
 
-I believe more papers and analysis on different algorithms should provide much more data on how their model performs under many different circumstances in order to make comparisons easier or application use more efficient. This is not easy as many parameters and aspects have to align. 
+I think more research papers and analyses on various algorithms should offer more information on their model's performance under a wide range of situations. This would make it easier to compare models and use them more effectively in real-world applications. However, it's not an easy task since many parameters and factors need to be considered.
 
-In my other repo, i have done the same analysis on the face transformer model from: https://github.com/zhongyy/Face-Transformer 
+In my other repository, I have performed a similar analysis on the face transformer model from: https://github.com/zhongyy/Face-Transformer
+
+It becomes quite evident that the face transformer, despite achieving decent levels of accuracy, struggles with generalization and is likely overfitted when faced with images that are blurry or low resolution. 
+
+If you have any questions, please email me at: Bauanrashid@hotmail.com
 
